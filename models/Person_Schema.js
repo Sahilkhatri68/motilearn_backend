@@ -20,5 +20,13 @@ const person_schema = new mongoose.Schema({
     type: Number,
     require: true,
   },
+  gender: {
+    type: String,
+    require: true,
+  },
+  dob: {
+    type: Date,
+    require: true,
+  },
 });
 module.exports = mongoose.model("person_schema", person_schema);

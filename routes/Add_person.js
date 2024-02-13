@@ -59,6 +59,8 @@ router.post("/", async (req, res) => {
     password: hashed_password,
     unique_Id: unique_Id,
     phone_no: req.body.phone_no,
+    gender: req.body.gender,
+    dob: req.body.dob,
   });
 
   try {
