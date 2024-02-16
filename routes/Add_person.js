@@ -3,21 +3,6 @@ const router = express.Router();
 const person_data = require("../models/Person_Schema");
 const bcryptjs = require("bcryptjs");
 
-// code to get all students
-router.get("/", async (req, res) => {
-  try {
-    const student = await person_data.find();
-    // const totalStudent = student.length;
-    res.json(student);
-  } catch (error) {
-    console.log("Error in getting student ", error);
-    res.status(400).json({
-      message: "Error",
-      status: "Error",
-    });
-  }
-});
-
 // code to add person_data with validation
 router.post("/", async (req, res) => {
   const url = req.protocol + "://" + req.get("host");
@@ -79,8 +64,9 @@ router.post("/", async (req, res) => {
 // code to delete by id
 router.delete("/:id", async (req, res) => {
   try {
-    const getstudentById = await person_data.deleteOne({
-      id: req.params.id,
+    console.log(req.params.id);
+    const getstudentById = await person_data.findByIdAndDelete({
+      _id: req.params.id,
     });
     res.json({
       message: "Student deleted",
@@ -93,4 +79,34 @@ router.delete("/:id", async (req, res) => {
     });
   }
 });
+
+// code to get student by id
+router.get("/getstudent/:id", async (req, res) => {
+  try {
+    const classbyId = await person_data.findById(req.params.id);
+    // .populate([{ path: "classStudents" }]);
+    res.json(classbyId);
+  } catch (error) {
+    res.status(400).json({ message: error.message, status: "error" });
+  }
+});
+
+// code to get all students
+router.get("/", async (req, res) => {
+  try {
+    const student = await person_data.find();
+    // const totalStudent = student.length;
+    res.json({
+      student: student,
+      totalStudents: student.length,
+    });
+  } catch (error) {
+    console.log("Error in getting student ", error);
+    res.status(400).json({
+      message: "Error",
+      status: "Error",
+    });
+  }
+});
+
 module.exports = router;

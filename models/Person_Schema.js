@@ -28,5 +28,13 @@ const person_schema = new mongoose.Schema({
     type: Date,
     require: true,
   },
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
+  otp: {
+    type: String,
+    require: true,
+  },
 });
 module.exports = mongoose.model("person_schema", person_schema);
