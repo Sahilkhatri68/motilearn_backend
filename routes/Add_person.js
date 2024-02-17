@@ -1,10 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const nodemailer = require("nodemailer");
-
+const cookiParser = require("cookie-parser");
 const person_data = require("../models/Person_Schema");
 const bcryptjs = require("bcryptjs");
 const sixDigitRandomNumber = Math.floor(Math.random() * 900000) + 100000;
+router.use(cookiParser()); //to store cookies
+
 // console.log(sixDigitRandomNumber);
 // code to send mail with nodemailer
 
@@ -30,15 +32,6 @@ router.post("/", async (req, res) => {
       .json({ message: "Invalid email address", status: "error" });
   }
 
-  // code to check if email is already exist in db or not
-  // const checkedemail = req.body.email;
-  // if (checkedemail === person_data.findOne({ email })) {
-  //   return res.status(400).json({
-  //     message: "Email Already exist!",
-  //     status: "error",
-  //   });
-  // }
-
   // Check if phone_no is a valid number
   const phoneNo = req.body.phone_no;
   if (isNaN(phoneNo) || phoneNo.length !== 10) {
@@ -47,6 +40,8 @@ router.post("/", async (req, res) => {
       status: "error",
     });
   }
+
+  // code to send email for verification
   const OTPemail = req.body.email;
   const transporter = nodemailer.createTransport({
     host: "smtp.office365.com",
@@ -60,7 +55,6 @@ router.post("/", async (req, res) => {
 
   const sendEmailOtp = (OTPemail) => {
     // Define email options
-
     const mailOptions = {
       from: "support@motilearn.info", // replace with your email
       to: OTPemail,
@@ -83,11 +77,21 @@ The Motilearn Team `,
       res.status(200).send("Email sent: " + info.response);
     });
   };
+  sendEmailOtp(OTPemail);
 
+  // code to hash password
   const salt = await bcryptjs.genSalt();
   const hashed_password = await bcryptjs.hash(req.body.password, salt); //for hashing password
-  sendEmailOtp(OTPemail);
+
+  // code to make random otp
   const unique_Id = Math.floor(Math.random() * 1000000000 + 1);
+
+  const fetchedEmailOtp = req.body.email_otp;
+
+  console.log("fetchedEmailOtp : " + fetchedEmailOtp);
+  console.log("sixDigitRandomNumber : " + sixDigitRandomNumber);
+
+  // code to match otp with cookies otp then it will give permessioin to signin
   const student = new person_data({
     name: req.body.name,
     email: req.body.email,
@@ -96,15 +100,22 @@ The Motilearn Team `,
     phone_no: req.body.phone_no,
     gender: req.body.gender,
     dob: req.body.dob,
+    otp: sixDigitRandomNumber,
   });
 
   try {
+    // const newstudent = await student.save();
+    // if (fetchedEmailOtp === sixDigitRandomNumber) {
     const newstudent = await student.save();
     res.status(201).json({
       message: "Student Registered",
       status: "success",
       data: newstudent,
     });
+    // } else {
+    //   console.log("Verification failed");
+    // }
+
     // Additional code for updating class can be added here
   } catch (error) {
     res.status(500).json({ message: error.message, status: "error" });

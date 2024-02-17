@@ -33,7 +33,7 @@ const person_schema = new mongoose.Schema({
     default: false,
   },
   otp: {
-    type: String,
+    type: Number,
     require: true,
   },
 });

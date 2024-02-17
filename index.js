@@ -6,6 +6,8 @@ const PORT = 4000;
 const cors = require("cors");
 const emailotp = require("./routes/emailotp");
 // code for connection with DB----
+const cookie = require("cookie");
+
 const connectDb = require("./config/dbconn");
 connectDb();
 
@@ -42,6 +44,7 @@ app.get("/", (req, res) => {
     message: "Motilearn server is running properly....",
   });
 });
+
 // API TO ADD NEW PERSON
 app.use("/api/newperson", require("./routes/Add_person"));
 // API TO LOGIN NEW PERSON
