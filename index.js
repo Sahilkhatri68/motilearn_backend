@@ -29,6 +29,7 @@ const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
   "https://motilearn-frontend.vercel.app",
+  "https://www.motilearn.site",
 ];
 app.use(
   cors({
