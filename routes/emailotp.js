@@ -3,6 +3,7 @@ const router = express.Router();
 const nodemailer = require("nodemailer");
 const sixDigitRandomNumber = Math.floor(Math.random() * 900000) + 100000;
 console.log(sixDigitRandomNumber);
+
 router.post("/", (req, res) => {
   // Get email details from the request body
   //   const { to, subject, text } = req.body;
@@ -23,7 +24,14 @@ router.post("/", (req, res) => {
     from: "support@motilearn.info", // replace with your email
     to: "jatindersinghrangra@gmail.com",
     subject: "TESTING",
-    text: `Email verification OTP is :  ${sixDigitRandomNumber} `,
+    text: `Hello jatindersinghrangra
+
+OTP Code: ${sixDigitRandomNumber}
+
+Above is your login verification code for Motilearn.com
+
+Thank you,
+The Motilearn Team `,
   };
 
   // Send the email

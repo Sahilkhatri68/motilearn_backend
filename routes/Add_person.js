@@ -1,7 +1,12 @@
 const express = require("express");
 const router = express.Router();
+const nodemailer = require("nodemailer");
+
 const person_data = require("../models/Person_Schema");
 const bcryptjs = require("bcryptjs");
+const sixDigitRandomNumber = Math.floor(Math.random() * 900000) + 100000;
+// console.log(sixDigitRandomNumber);
+// code to send mail with nodemailer
 
 // code to add person_data with validation
 router.post("/", async (req, res) => {
@@ -25,6 +30,15 @@ router.post("/", async (req, res) => {
       .json({ message: "Invalid email address", status: "error" });
   }
 
+  // code to check if email is already exist in db or not
+  // const checkedemail = req.body.email;
+  // if (checkedemail === person_data.findOne({ email })) {
+  //   return res.status(400).json({
+  //     message: "Email Already exist!",
+  //     status: "error",
+  //   });
+  // }
+
   // Check if phone_no is a valid number
   const phoneNo = req.body.phone_no;
   if (isNaN(phoneNo) || phoneNo.length !== 10) {
@@ -33,10 +47,46 @@ router.post("/", async (req, res) => {
       status: "error",
     });
   }
+  const OTPemail = req.body.email;
+  const transporter = nodemailer.createTransport({
+    host: "smtp.office365.com",
+    port: 587,
+    secure: false, // set to true if you're using SSL/TLS
+    auth: {
+      user: "support@motilearn.info",
+      pass: "Sahil@2024",
+    },
+  });
+
+  const sendEmailOtp = (OTPemail) => {
+    // Define email options
+
+    const mailOptions = {
+      from: "support@motilearn.info", // replace with your email
+      to: OTPemail,
+      subject: "TESTING EMAIL VERIFICATION",
+      text: `Hello
+
+OTP Code: ${sixDigitRandomNumber}
+
+Above is your login verification code for Motilearn.com
+
+Thank you,
+The Motilearn Team `,
+    };
+
+    // Send the email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        return res.status(500).send(error.toString());
+      }
+      res.status(200).send("Email sent: " + info.response);
+    });
+  };
 
   const salt = await bcryptjs.genSalt();
   const hashed_password = await bcryptjs.hash(req.body.password, salt); //for hashing password
-
+  sendEmailOtp(OTPemail);
   const unique_Id = Math.floor(Math.random() * 1000000000 + 1);
   const student = new person_data({
     name: req.body.name,
@@ -53,7 +103,7 @@ router.post("/", async (req, res) => {
     res.status(201).json({
       message: "Student Registered",
       status: "success",
-      data: student,
+      data: newstudent,
     });
     // Additional code for updating class can be added here
   } catch (error) {
